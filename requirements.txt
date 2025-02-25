@@ -1,0 +1,8 @@
+torch
+torchvision
+torchaudio
+transformers
+Pillow
+faiss-cpu
+flask
+boto3

@@ -1,0 +1,38 @@
+name: Deploy to AWS EC2
+
+on:
+  push:
+    branches:
+      - main  # Deploy when code is pushed to main branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Set up SSH
+      run: |
+        echo "${{ secrets.EC2_SSH_KEY }}" > deploy-key
+        chmod 600 deploy-key
+
+    - name: Deploy to EC2
+      run: |
+        ssh -o StrictHostKeyChecking=no -i deploy-key ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+          # Stop the existing app
+          sudo pkill -f app.py || true
+          
+          # Navigate to the project directory
+          cd ~/image-search-app || exit 1
+          
+          # Pull latest code
+          git pull origin main
+          
+          # Install dependencies
+          pip3 install --user -r requirements.txt
+          
+          # Restart the application
+          nohup python3 app.py > output.log 2>&1 &
+        EOF
