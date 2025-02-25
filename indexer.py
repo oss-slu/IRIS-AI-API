@@ -8,7 +8,7 @@ from config import IMAGE_DIR, FAISS_INDEX_FILE, EMBEDDING_DIM
 import boto3
 
 
-BUCKET_NAME = 'iris-slu'
+BUCKET_NAME = 'slu-iris'
 BUCKET_URL = f'https://{BUCKET_NAME}.s3.us-east-2.amazonaws.com/'
 
 # Load CLIP model
@@ -36,7 +36,7 @@ def get_image_embedding(image_path):
 
 # Process all images
 for filename in os.listdir("images/"):
-    if filename.endswith(".jpg",".png"):
+    if filename.endswith((".jpg",".png")):
         local_path = os.path.join("images/", filename)
         s3_path = "images/" + filename
         
@@ -57,5 +57,5 @@ for filename in os.listdir("images/"):
 
 # Save FAISS index
 faiss.write_index(index, FAISS_INDEX_FILE)
-np.save("image_paths.npy", np.array(image_urls))
+np.save("image_urls.npy", np.array(image_urls))
 print(f"Indexed {len(image_urls)} images.")
