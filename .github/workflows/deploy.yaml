@@ -30,9 +30,13 @@ jobs:
           # Pull latest code
           git pull origin main
           
-          # Install dependencies
-          pip install --user -r requirements.txt
+          # Ensure Python virtual environment is set up
+          python3 -m venv venv
+          source venv/bin/activate
           
-          # Restart the application
-          nohup python3 app.py > output.log 2>&1 &
+          # Install dependencies in venv
+          pip install -r requirements.txt
+          
+          # Restart the application using venv's Python
+          nohup venv/bin/python app.py > output.log 2>&1 &
         EOF
