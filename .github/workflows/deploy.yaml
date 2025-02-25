@@ -31,7 +31,7 @@ jobs:
           git pull origin main
           
           # Install dependencies
-          pip3 install --user -r requirements.txt
+          pip install --user -r requirements.txt
           
           # Restart the application
           nohup python3 app.py > output.log 2>&1 &
