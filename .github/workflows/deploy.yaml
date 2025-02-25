@@ -25,7 +25,7 @@ jobs:
           sudo pkill -f app.py || true
           
           # Navigate to the project directory
-          cd ~/image-search-app || exit 1
+          cd ~/IRIS-AI-API || exit 1
           
           # Pull latest code
           git pull origin main
