@@ -12,12 +12,13 @@ RUN apt-get update && apt-get install -y python3-pip python3-venv && \
 COPY . .
 
 # Set up a virtual environment inside /app/venv
-RUN python3 -m venv /app/venv && \
-    /app/venv/bin/pip install --upgrade pip && \
-    /app/venv/bin/pip install --no-cache-dir -r requirements.txt
+RUN python3 -m venv /app/venv
+
+# Activate venv and install dependencies
+RUN /app/venv/bin/pip install --no-cache-dir -r requirements.txt
 
 # Expose Flask port
 EXPOSE 5000
 
-# Ensure virtual environment is activated before running Uvicorn
-CMD ["/bin/bash", "-c", "source /app/venv/bin/activate && exec uvicorn app:app --host 0.0.0.0 --port 5000"]
+# Use Gunicorn with the venv
+CMD ["/app/venv/bin/gunicorn", "-w", "2", "-b", "0.0.0.0:5000", "app:app"]
