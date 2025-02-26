@@ -21,4 +21,4 @@ RUN /app/venv/bin/pip install --no-cache-dir -r requirements.txt
 EXPOSE 5000
 
 # Use Gunicorn with the venv
-CMD ["/app/venv/bin/gunicorn", "-w", "2", "-b", "0.0.0.0:5000", "app:app"]
+CMD ["/app/venv/bin/uvicorn", "app:app", "--host", "0.0.0.0", "--port", "5000"]

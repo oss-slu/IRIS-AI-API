@@ -6,4 +6,4 @@ Pillow
 faiss-cpu
 flask
 boto3
-gunicorn
+uvicorn
