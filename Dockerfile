@@ -1,19 +1,24 @@
-# Use NVIDIA's official CUDA base image with Python 3.8
+# Use NVIDIA's CUDA base image with Python 3.8
 FROM nvidia/cuda:12.2.0-runtime-ubuntu22.04
 
 # Set working directory
 WORKDIR /app
 
-# Install dependencies
-COPY requirements.txt .
-RUN apt-get update && apt-get install -y python3-pip && \
-    pip3 install --no-cache-dir -r requirements.txt
-
-# Expose Flask port
-EXPOSE 5000
+# Install system dependencies
+RUN apt-get update && apt-get install -y python3-pip python3-venv && \
+    rm -rf /var/lib/apt/lists/*  # Clean up
 
 # Copy the application files
 COPY . .
 
-# Use Gunicorn for better performance
-CMD ["gunicorn", "-w", "2", "-b", "0.0.0.0:5000", "app:app"]
+# Set up a virtual environment inside /app/venv
+RUN python3 -m venv /app/venv
+
+# Activate venv and install dependencies
+RUN /app/venv/bin/pip install --no-cache-dir -r requirements.txt
+
+# Expose Flask port
+EXPOSE 5000
+
+# Use Gunicorn with the venv
+CMD ["/app/venv/bin/gunicorn", "-w", "2", "-b", "0.0.0.0:5000", "app:app"]
