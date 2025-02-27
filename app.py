@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 import os
+import base64
 from search import find_similar_images
 
 app = Flask(__name__)
@@ -9,16 +10,31 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 @app.route("/search", methods=["POST"])
 def search_images():
-    if "image" not in request.files:
-        return jsonify({"error": "No file uploaded"}), 400
+    data = request.json
+    if not data or "image" not in data:
+        return jsonify({"error": "No image provided"}), 400
     
-    file = request.files["image"]
-    file_path = os.path.join(UPLOAD_FOLDER, file.filename)
-    file.save(file_path)
+    try:
+        # Extract Base64 image string
+        base64_image = data["image"].split(",")[1]  # Remove 'data:image/jpeg;base64,' prefix if present
+        
+        # Decode Base64 to binary image data
+        image_data = base64.b64decode(base64_image)
 
-    similar_images = find_similar_images(file_path, k=5)
+        # Define file path to save the image
+        file_path = os.path.join(UPLOAD_FOLDER, "uploaded_image.jpg")
+        
+        # Save the image file
+        with open(file_path, "wb") as f:
+            f.write(image_data)
 
-    return jsonify({"similar_images": similar_images})
+        # Process the image with your function
+        similar_images = find_similar_images(file_path, k=5)
+
+        return jsonify({"similar_images": similar_images})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
