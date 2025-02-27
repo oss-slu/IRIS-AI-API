@@ -8,14 +8,17 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y python3-pip python3-venv && \
     rm -rf /var/lib/apt/lists/*  # Clean up
 
-# Copy the application files
-COPY . .
-
 # Set up a virtual environment inside /app/venv
 RUN python3 -m venv /app/venv
 
+# Copy only the requirements file first (optimizing caching)
+COPY requirements.txt .
+
 # Activate venv and install dependencies
 RUN /app/venv/bin/pip install --no-cache-dir -r requirements.txt
+
+# Now copy the rest of the application files
+COPY . .
 
 # Expose Flask port
 EXPOSE 5000
